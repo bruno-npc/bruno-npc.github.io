@@ -1,0 +1,12 @@
+.contact-section {
+  padding: 4rem 0;
+  background-color: #f8f8f8;
+}
+
+.dark-mode .contact-section {
+  background-color: #2c2c2c;
+}
+
+.contact-form {
+  max-width: 500px;
+}

@@ -1,0 +1,36 @@
+.admin-section {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+  padding-top: 80px;
+  background-color: #f8f8f8;
+}
+
+.dark-mode .admin-section {
+  background-color: #2c2c2c;
+}
+
+.admin-container {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 1000px;
+  margin-top: 20px;
+}
+
+.dark-mode .admin-container {
+  background: #333;
+  color: white;
+}
+
+.admin-container h2 {
+  font-weight: bold;
+  text-align: center;
+}
+
+.admin-tabs {
+  margin-top: 1rem;
+}

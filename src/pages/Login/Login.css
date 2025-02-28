@@ -1,0 +1,29 @@
+.login-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f8f8f8;
+}
+
+.dark-mode .login-section {
+  background-color: #2c2c2c;
+}
+
+.login-container {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+}
+
+.dark-mode .login-container {
+  background: #333;
+  color: white;
+}
+
+.login-container h2 {
+  font-weight: bold;
+}

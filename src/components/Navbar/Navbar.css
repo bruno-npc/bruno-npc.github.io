@@ -1,0 +1,87 @@
+.custom-navbar {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.custom-navbar .navbar-brand {
+  color: #333 !important;
+}
+
+.custom-navbar .nav-link,
+.custom-navbar .login-button,
+.custom-navbar .logout-button,
+.custom-navbar .admin-button {
+  color: #333 !important;
+  background: none;
+  border: none;
+  font-size: 18px;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 5px;
+}
+
+.custom-navbar .nav-link:hover,
+.custom-navbar .login-button:hover,
+.custom-navbar .logout-button:hover,
+.custom-navbar .admin-button:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.dark-mode .custom-navbar {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.dark-mode .custom-navbar .navbar-brand,
+.dark-mode .custom-navbar .nav-link,
+.dark-mode .custom-navbar .login-button,
+.dark-mode .custom-navbar .logout-button,
+.dark-mode .custom-navbar .admin-button {
+  color: #fff !important;
+}
+
+.dark-mode .custom-navbar .nav-link:hover,
+.dark-mode .custom-navbar .login-button:hover,
+.dark-mode .custom-navbar .logout-button:hover,
+.dark-mode .custom-navbar .admin-button:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.theme-toggle-button {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 15px;
+  padding: 6px;
+  border-radius: 50%;
+  transition: all 0.3s ease-in-out;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+}
+
+.theme-icon {
+  transition: color 0.3s ease-in-out;
+}
+
+.dark-mode .theme-toggle-button {
+  background-color: white;
+  box-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+}
+
+.dark-mode .theme-icon {
+  color: #007bff;
+}
+
+.theme-toggle-button {
+  background-color: #222;
+  color: white;
+}
+
+.theme-toggle-button:hover {
+  transform: scale(1.1);
+}

@@ -1,0 +1,89 @@
+.skills-section {
+  padding: 4rem 0;
+  background-color: #f8f8f8;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.dark-mode .skills-section {
+  background-color: #2c2c2c;
+}
+
+.skills-container {
+  display: flex;
+  width: 80%;
+  max-width: 1000px;
+  gap: 2rem;
+}
+
+.skills-left {
+  flex: 1;
+  background: #fff;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.dark-mode .skills-left {
+  background: #333;
+  color: white;
+}
+
+.skill-details {
+  margin-top: 1rem;
+}
+
+.skills-right {
+  flex: 2;
+  background: #fff;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+  gap: 1rem;
+}
+
+.dark-mode .skills-right {
+  background: #333;
+  color: white;
+}
+
+.skill-icon-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 8px;
+  padding: 1rem;
+  transition: all 0.3s ease-in-out;
+  position: relative;
+}
+
+.skill-icon-container:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.dark-mode .skill-icon-container {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.dark-mode .skill-icon-container:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+.skill-icon {
+  font-size: 2rem;
+}
+.skill-icon-container.selected {
+  border: 2px solid #007bff;
+  box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.dark-mode .skill-icon-container.selected {
+  border: 2px solid #80bfff;
+  box-shadow: 0 0 10px rgba(128, 191, 255, 0.7);
+}

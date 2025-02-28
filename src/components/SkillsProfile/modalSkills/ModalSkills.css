@@ -1,0 +1,42 @@
+.icon-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  max-height: 150px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  padding: 0.5rem;
+  border-radius: 5px;
+  background: #f8f8f8;
+}
+
+.icon-btn {
+  font-size: 0.85rem;
+}
+
+.tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.tag-badge {
+  background-color: #007bff;
+  color: #fff;
+  padding: 0.3rem 0.6rem;
+  border-radius: 20px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.tag-remove-btn {
+  color: #fff;
+  margin-left: 0.3rem;
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.description-item {
+  position: relative;
+}

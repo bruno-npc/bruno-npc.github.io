@@ -1,0 +1,139 @@
+.education-section {
+  padding: 4rem 0;
+  background-color: #f8f8f8;
+  display: flex;
+  justify-content: center;
+  align-items: center; /* Centraliza verticalmente */
+  min-height: 100vh;
+}
+
+.dark-mode .education-section {
+  background-color: #2c2c2c;
+}
+
+.education-container {
+  display: flex;
+  width: 90%;
+  max-width: 1200px;
+  margin: 0 auto;
+  gap: 2rem;
+}
+
+.education-list {
+  flex: 1;
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 1.5rem 1rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.dark-mode .education-list {
+  background-color: #333;
+  color: #fff;
+  box-shadow: 0 4px 6px rgba(128, 191, 255, 0.2);
+}
+
+.education-list h2 {
+  font-size: 1.25rem;
+  margin-bottom: 1rem;
+  color: #007bff;
+  font-weight: 600;
+}
+
+.dark-mode .education-list h2 {
+  color: #80bfff;
+}
+
+.education-item {
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.5rem;
+  border-radius: 6px;
+  transition: background-color 0.3s, box-shadow 0.3s;
+  cursor: pointer;
+}
+
+.education-item h3 {
+  font-size: 1rem;
+  margin: 0;
+  font-weight: 500;
+}
+
+.education-item span {
+  font-size: 0.85rem;
+  color: #888;
+  display: block;
+}
+
+.education-item:hover {
+  background-color: #e7f1ff;
+  box-shadow: 0 2px 4px rgba(0, 123, 255, 0.1);
+}
+
+.dark-mode .education-item:hover {
+  background-color: #404040;
+  box-shadow: 0 2px 4px rgba(128, 191, 255, 0.2);
+}
+
+.education-item.active {
+  background-color: #dceeff;
+  border-left: 4px solid #007bff;
+}
+
+.dark-mode .education-item.active {
+  background-color: #4d4d4d;
+  border-left: 4px solid #80bfff;
+}
+
+.education-details {
+  flex: 2;
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 2rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.dark-mode .education-details {
+  background-color: #333;
+  color: #fff;
+  box-shadow: 0 4px 6px rgba(128, 191, 255, 0.2);
+}
+
+.education-details h3 {
+  margin-top: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #007bff;
+}
+
+.dark-mode .education-details h3 {
+  color: #80bfff;
+}
+
+.education-details p {
+  margin-bottom: 1rem;
+  line-height: 1.4;
+}
+
+.education-details ul {
+  list-style-type: disc;
+  padding-left: 1rem;
+  margin-bottom: 1rem;
+  line-height: 1.4;
+}
+
+.education-details strong {
+  color: #333;
+}
+
+.dark-mode .education-details strong {
+  color: #fff;
+}
+
+.btn-primary {
+  margin-top: 1rem;
+  transition: background-color 0.3s;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+}
