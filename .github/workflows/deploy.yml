@@ -3,23 +3,20 @@ name: Deploy React App para GitHub Pages
 on:
   push:
     branches: [ "main" ]
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      # 1) Fazer checkout do seu código
       - uses: actions/checkout@v3
 
-      # 2) Configurar Node.js (versão 16 ou 18)
       - uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 18
 
-      # 3) Instalar dependências
-      - name: Install dependencies
+      - name: Instalar dependências
         run: npm install
 
-      # 4) Build do React, injetando as secrets de ambiente
       - name: Build
         run: npm run build
         env:
@@ -30,27 +27,22 @@ jobs:
           REACT_APP_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.REACT_APP_FIREBASE_MESSAGING_SENDER_ID }}
           REACT_APP_FIREBASE_APP_ID: ${{ secrets.REACT_APP_FIREBASE_APP_ID }}
 
-      # 5) Fazer upload dos arquivos de build para usar no job de deploy
-      - name: Upload production-ready build files
-        uses: actions/upload-pages-artifact@v1
+      - name: Upload dos arquivos de build
+        uses: actions/upload-pages-artifact@v3
         with:
           path: ./build
 
   deploy:
-    # Este job depende do job "build" (só roda se o build passar)
     needs: build
     runs-on: ubuntu-latest
-    
-    # Permissões para escrever na Pages
+
     permissions:
       pages: write
       id-token: write
-    
+
     steps:
-      - name: Deploy to GitHub Pages
-        uses: actions/deploy-pages@v1
+      - name: Deploy para o GitHub Pages
+        uses: actions/deploy-pages@v4
         with:
-          # Publica no branch gh-pages (padrão do GitHub Pages)
-          # Se você quer outro branch, altere aqui
           branch: gh-pages
           token: ${{ secrets.GITHUB_TOKEN }}
