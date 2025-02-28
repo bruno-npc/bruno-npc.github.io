@@ -14,6 +14,16 @@ jobs:
         with:
           node-version: 18
 
+      - name: Exibir variáveis de ambiente para depuração
+        run: |
+          echo "Firebase Config Debug:"
+          echo "API Key: ${{ secrets.REACT_APP_FIREBASE_API_KEY }}"
+          echo "Auth Domain: ${{ secrets.REACT_APP_FIREBASE_AUTH_DOMAIN }}"
+          echo "Project ID: ${{ secrets.REACT_APP_FIREBASE_PROJECT_ID }}"
+          echo "Storage Bucket: ${{ secrets.REACT_APP_FIREBASE_STORAGE_BUCKET }}"
+          echo "Messaging Sender ID: ${{ secrets.REACT_APP_FIREBASE_MESSAGING_SENDER_ID }}"
+          echo "App ID: ${{ secrets.REACT_APP_FIREBASE_APP_ID }}"
+
       - name: Instalar dependências
         run: npm install
 
