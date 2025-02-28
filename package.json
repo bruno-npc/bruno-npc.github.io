@@ -2,6 +2,7 @@
   "name": "my-portfolio",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://bruno-npc.github.io",
   "dependencies": {
     "bootstrap": "^5.3.3",
     "cra-template": "1.2.0",
