@@ -1,42 +1,59 @@
 import React, { useState, useEffect } from "react";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../firebaseConfig";
+import localforage from "localforage";
 import "./Education.css";
+
+const CACHE_KEY = "educationData";
+const ONE_HOUR = 60 * 60 * 1000;
 
 function Education() {
   const [educations, setEducations] = useState([]);
   const [selectedEducation, setSelectedEducation] = useState(null);
 
   useEffect(() => {
+    const fetchEducations = async () => {
+      try {
+        const cachedData = await localforage.getItem(CACHE_KEY);
+        if (cachedData) {
+          const { educations: cachedEducations, lastFetched } = cachedData;
+          setEducations(cachedEducations);
+          if (cachedEducations.length > 0) {
+            setSelectedEducation(cachedEducations[0]);
+          }
+          if (Date.now() - lastFetched < ONE_HOUR) {
+            return;
+          }
+        }
+
+        const querySnapshot = await getDocs(collection(db, "educations"));
+        const list = [];
+        querySnapshot.forEach((docSnap) => {
+          list.push({ id: docSnap.id, ...docSnap.data() });
+        });
+        setEducations(list);
+        if (list.length > 0) {
+          setSelectedEducation(list[0]);
+        }
+
+        await localforage.setItem(CACHE_KEY, {
+          educations: list,
+          lastFetched: Date.now(),
+        });
+      } catch (error) {
+        console.error("Erro ao buscar educations (público):", error);
+      }
+    };
+
     fetchEducations();
   }, []);
 
-  const fetchEducations = async () => {
-    try {
-      const querySnapshot = await getDocs(collection(db, "educations"));
-      const list = [];
-      querySnapshot.forEach((docSnap) => {
-        list.push({ id: docSnap.id, ...docSnap.data() });
-      });
-      setEducations(list);
-
-      // Seleciona a primeira, se existir
-      if (list.length > 0) {
-        setSelectedEducation(list[0]);
-      }
-    } catch (error) {
-      console.error("Erro ao buscar educations (público):", error);
-    }
-  };
-
-  // Formata data "YYYY-MM-DD" para "DD/MM/YYYY"
   const formatDate = (dateStr) => {
     if (!dateStr) return "";
     const [year, month, day] = dateStr.split("-");
     return `${day}/${month}/${year}`;
   };
 
-  // Monta o período
   const getPeriod = (edu) => {
     const start = formatDate(edu.startDate);
     const end = edu.endDate ? formatDate(edu.endDate) : "Atual";
@@ -48,7 +65,6 @@ function Education() {
     if (edu.type === "Graduação") {
       return <p>{edu.details}</p>;
     } else {
-      // Tenta dividir por vírgula
       const items = edu.details ? edu.details.split(",") : [];
       return (
         <ul>
@@ -88,7 +104,6 @@ function Education() {
               <strong>Período:</strong> {getPeriod(selectedEducation)}
             </p>
             {renderDetails(selectedEducation)}
-
             {selectedEducation.link && (
               <a
                 href={selectedEducation.link}

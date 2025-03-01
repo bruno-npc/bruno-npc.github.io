@@ -3,7 +3,11 @@ import { Container, Row, Col, Card, Button, Spinner } from "react-bootstrap";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../firebaseConfig";
 import { Link } from "react-router-dom";
+import localforage from "localforage"; // Importa o localforage
 import "./Projects.css";
+
+const CACHE_KEY = "projectsData";
+const ONE_HOUR = 60 * 60 * 1000; // 3600000 ms
 
 function Projects() {
   const [projects, setProjects] = useState([]);
@@ -13,12 +17,35 @@ function Projects() {
   useEffect(() => {
     const fetchProjects = async () => {
       try {
+        // Tenta obter os dados do cache
+        const cachedData = await localforage.getItem(CACHE_KEY);
+
+        if (cachedData) {
+          const { projects: cachedProjects, lastFetched } = cachedData;
+          // Atualiza o estado com os dados do cache imediatamente
+          setProjects(cachedProjects);
+
+          // Se os dados foram buscados há menos de 1 hora, não refaz a consulta
+          if (Date.now() - lastFetched < ONE_HOUR) {
+            setLoading(false);
+            return;
+          }
+          // Caso contrário, cai para atualizar os dados (caso o cache esteja desatualizado)
+        }
+
+        // Busca os dados atualizados no Firestore
         const querySnapshot = await getDocs(collection(db, "projetos"));
         const projectsList = querySnapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
         }));
         setProjects(projectsList);
+
+        // Salva os dados atualizados no cache junto com o timestamp atual
+        await localforage.setItem(CACHE_KEY, {
+          projects: projectsList,
+          lastFetched: Date.now(),
+        });
       } catch (error) {
         console.error("Erro ao buscar projetos:", error);
         setError("Erro ao carregar os projetos. Tente novamente mais tarde.");
@@ -30,13 +57,12 @@ function Projects() {
     fetchProjects();
   }, []);
 
-  // Trunca descrição para 100 caracteres
+  // Funções auxiliares para truncar descrição e stacks
   const truncateDescription = (desc = "", maxLen = 100) => {
     if (desc.length <= maxLen) return desc;
     return desc.substring(0, maxLen) + "...";
   };
 
-  // Trunca stacks (mostra apenas 3)
   const truncateStacks = (stacks = [], maxCount = 3) => {
     if (stacks.length <= maxCount) return stacks.join(", ");
     const sliced = stacks.slice(0, maxCount);
@@ -58,7 +84,6 @@ function Projects() {
         {!loading && projects.length === 0 && (
           <p className="text-center text-muted">Nenhum projeto cadastrado.</p>
         )}
-
         {!loading && projects.length > 0 && (
           <Row>
             {projects.map((proj) => {
@@ -66,7 +91,6 @@ function Projects() {
               const truncatedStacks = Array.isArray(proj.stacks)
                 ? truncateStacks(proj.stacks)
                 : "";
-
               const firstImage =
                 Array.isArray(proj.images) && proj.images[0]
                   ? proj.images[0]
@@ -84,8 +108,6 @@ function Projects() {
                         </Card.Text>
                         <Card.Text>{truncatedDesc}</Card.Text>
                       </div>
-
-                      {/* Único botão: "Ver Mais" */}
                       <div className="buttons-container">
                         <Link to={`/project/${proj.id}`}>
                           <Button variant="primary">Ver Mais</Button>

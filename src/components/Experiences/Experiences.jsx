@@ -1,32 +1,52 @@
 import React, { useState, useEffect } from "react";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../firebaseConfig";
+import localforage from "localforage";
 import "./Experiences.css";
+
+const CACHE_KEY = "experiencesData";
+const ONE_HOUR = 60 * 60 * 1000;
 
 function Experiences() {
   const [experiences, setExperiences] = useState([]);
   const [selectedExperience, setSelectedExperience] = useState(null);
 
   useEffect(() => {
+    const fetchExperiences = async () => {
+      try {
+        const cachedData = await localforage.getItem(CACHE_KEY);
+        if (cachedData) {
+          const { experiences: cachedExperiences, lastFetched } = cachedData;
+          setExperiences(cachedExperiences);
+          if (cachedExperiences.length > 0) {
+            setSelectedExperience(cachedExperiences[0]);
+          }
+          if (Date.now() - lastFetched < ONE_HOUR) {
+            return;
+          }
+        }
+
+        const querySnapshot = await getDocs(collection(db, "experiences"));
+        const expList = [];
+        querySnapshot.forEach((docSnap) => {
+          expList.push({ id: docSnap.id, ...docSnap.data() });
+        });
+        setExperiences(expList);
+        if (expList.length > 0) {
+          setSelectedExperience(expList[0]);
+        }
+
+        await localforage.setItem(CACHE_KEY, {
+          experiences: expList,
+          lastFetched: Date.now(),
+        });
+      } catch (error) {
+        console.error("Erro ao buscar experiências:", error);
+      }
+    };
+
     fetchExperiences();
   }, []);
-
-  const fetchExperiences = async () => {
-    try {
-      const querySnapshot = await getDocs(collection(db, "experiences"));
-      const expList = [];
-      querySnapshot.forEach((docSnap) => {
-        expList.push({ id: docSnap.id, ...docSnap.data() });
-      });
-      setExperiences(expList);
-
-      if (expList.length > 0) {
-        setSelectedExperience(expList[0]);
-      }
-    } catch (error) {
-      console.error("Erro ao buscar experiências:", error);
-    }
-  };
 
   const formatDate = (dateStr) => {
     if (!dateStr) return "";

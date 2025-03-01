@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { FaGithub, FaLinkedinIn, FaInstagram } from "react-icons/fa";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../firebaseConfig";
+import localforage from "localforage";
 import "./Hero.css";
 import profilePic from "../../assets/perfil.jpeg";
 
@@ -14,6 +15,13 @@ function Hero() {
   useEffect(() => {
     const fetchProfileData = async () => {
       try {
+        const cachedProfile = await localforage.getItem("profileData");
+        if (cachedProfile) {
+          setAboutTitle(cachedProfile.aboutTitle || "");
+          setAboutSubtitle(cachedProfile.aboutSubtitle || "");
+          setAboutDescription(cachedProfile.aboutDescription || "");
+        }
+
         const ref = doc(db, "profileData", "meuPerfil");
         const snap = await getDoc(ref);
         if (snap.exists()) {
@@ -21,11 +29,18 @@ function Hero() {
           setAboutTitle(data.aboutTitle || "");
           setAboutSubtitle(data.aboutSubtitle || "");
           setAboutDescription(data.aboutDescription || "");
+          
+          await localforage.setItem("profileData", {
+            aboutTitle: data.aboutTitle || "",
+            aboutSubtitle: data.aboutSubtitle || "",
+            aboutDescription: data.aboutDescription || "",
+          });
         }
       } catch (error) {
         console.error("Erro ao buscar dados do perfil:", error);
       }
     };
+
     fetchProfileData();
   }, []);
 
