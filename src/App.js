@@ -17,6 +17,43 @@ import { onAuthStateChanged } from "firebase/auth";
 import ProjectDetails from "./pages/ProjectDetails/ProjectDetails";
 import MaintenanceAlert from "./components/MaintenanceAlert/MaintenanceAlert";
 
+// Componente protetor para rota Admin
+const ProtectedRoute = ({ user, children }) => {
+  const [isVerifying, setIsVerifying] = useState(true);
+  const navigate = useNavigate();
+  
+  useEffect(() => {
+    // Se não houver usuário, redireciona para login
+    if (!user) {
+      navigate("/login");
+      return;
+    }
+    
+    // Verifica se o token do usuário é válido
+    const verifyAuth = async () => {
+      try {
+        // Solicita um novo token para garantir que a sessão é válida
+        await user.getIdToken(true);
+        setIsVerifying(false);
+      } catch (error) {
+        console.error("Erro de autenticação:", error);
+        // Se houver erro, redireciona para login
+        navigate("/login");
+      }
+    };
+    
+    verifyAuth();
+  }, [user, navigate]);
+
+  // Enquanto verifica, não renderiza nada
+  if (isVerifying) {
+    return null;
+  }
+
+  // Renderiza o componente filho se o usuário estiver autenticado
+  return children;
+};
+
 function App() {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [user, setUser] = useState(null);
@@ -86,49 +123,17 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route
             path="/admin"
-            element={<ProtectedAdmin user={user} />}
+            element={
+              <ProtectedRoute user={user}>
+                <Admin />
+              </ProtectedRoute>
+            }
           />
           <Route path="/project/:id" element={<ProjectDetails />} />
         </Routes>
       </Router>
     </ThemeProvider>
   );
-}
-
-function ProtectedAdmin({ user }) {
-  const navigate = useNavigate();
-  const [isVerifying, setIsVerifying] = useState(true);
-  
-  useEffect(() => {
-    // Se não houver usuário, redireciona para login
-    if (!user) {
-      navigate("/login");
-      return;
-    }
-    
-    // Verifica se o token do usuário é válido
-    const verifyAuth = async () => {
-      try {
-        // Solicita um novo token para garantir que a sessão é válida
-        await user.getIdToken(true);
-        setIsVerifying(false);
-      } catch (error) {
-        console.error("Erro de autenticação:", error);
-        // Se houver erro, redireciona para login
-        navigate("/login");
-      }
-    };
-    
-    verifyAuth();
-  }, [user, navigate]);
-
-  // Enquanto verifica, não renderiza nada
-  if (isVerifying) {
-    return null;
-  }
-
-  // Renderiza o Admin apenas se o usuário estiver autenticado
-  return user ? <Admin /> : null;
 }
 
 export default App;

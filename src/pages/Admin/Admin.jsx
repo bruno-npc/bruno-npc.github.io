@@ -2,12 +2,11 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { auth } from "../../firebaseConfig";
-import { Container, Row, Col, Tabs, Tab, Button } from "react-bootstrap";
+import { Tabs, Tab } from "react-bootstrap";
 import localforage from "localforage";
 import { 
   Box, 
   Typography, 
-  Grid, 
   Paper, 
   Button as MuiButton,
   useTheme,

@@ -11,8 +11,7 @@ import {
   List, 
   ListItem, 
   ListItemText, 
-  ListItemIcon,
-  useTheme
+  ListItemIcon
 } from "@mui/material";
 import { 
   Menu as MenuIcon, 
@@ -46,7 +45,6 @@ const navItems = [
 function Navbar({ isDarkMode, onToggleDarkMode, user }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("home");
-  const theme = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Container, Typography, Divider } from '@mui/material';
+import { Box, Container, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 
 // Container estilizado para seções
