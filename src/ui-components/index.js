@@ -1,0 +1,60 @@
+// Exportando todos os componentes da biblioteca
+export { default as Avatar } from './Avatar';
+export { default as Button } from './Button';
+export { default as Card } from './Card';
+export { default as Section } from './Section';
+export { default as SocialIcon } from './SocialIcon';
+export { default as TextField } from './TextField';
+
+// Re-exportando componentes do Material UI que usamos frequentemente
+export {
+  Box,
+  Container,
+  Grid,
+  Typography,
+  Divider,
+  Paper,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemIcon,
+  Chip,
+  Tabs,
+  Tab,
+  AppBar,
+  Toolbar,
+  IconButton,
+  Menu,
+  MenuItem,
+  Drawer,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Snackbar,
+  Alert,
+  CircularProgress,
+  LinearProgress,
+  Skeleton,
+  Tooltip,
+  Badge,
+  Switch,
+  FormControl,
+  FormLabel,
+  FormGroup,
+  FormControlLabel,
+  Checkbox,
+  Radio,
+  RadioGroup,
+  Select,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  Breadcrumbs,
+  Link,
+  Backdrop,
+  Fade,
+  Grow,
+  Slide,
+  Zoom,
+} from '@mui/material'; 

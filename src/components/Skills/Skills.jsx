@@ -17,7 +17,16 @@ import {
   SiTypescript,
   SiTailwindcss,
 } from "react-icons/si";
-import "./Skills.css";
+import { 
+  Box, 
+  Typography, 
+  Grid, 
+  Paper, 
+  useTheme,
+  IconButton,
+  Tooltip
+} from "@mui/material";
+import { Section } from "../../ui-components";
 
 const skillsData = [
   {
@@ -98,35 +107,86 @@ const skillsData = [
 
 function Skills() {
   const [selectedSkill, setSelectedSkill] = useState(0);
+  const theme = useTheme();
 
   return (
-    <section id="skills" className="skills-section">
-      <div className="skills-container">
-        <div className="skills-left">
-          <h2>Conhecimentos</h2>
-          <div className="skill-details">
-            <h3>{skillsData[selectedSkill].name}</h3>
-            <p>{skillsData[selectedSkill].description}</p>
-          </div>
-        </div>
-        <div className="skills-right">
-          {skillsData.map((skill, index) => {
-            const isSelected = index === selectedSkill;
+    <Section 
+      id="skills" 
+      title="Conhecimentos"
+      bgColor={theme.palette.background.default}
+    >
+      <Grid container spacing={4}>
+        <Grid item xs={12} md={6}>
+          <Paper 
+            elevation={3} 
+            sx={{ 
+              p: 3, 
+              borderRadius: 2,
+              height: '100%',
+              backgroundColor: theme.palette.background.paper,
+              transition: 'all 0.3s ease',
+            }}
+          >
+            <Typography variant="h5" component="h3" gutterBottom>
+              {skillsData[selectedSkill].name}
+            </Typography>
+            <Typography variant="body1">
+              {skillsData[selectedSkill].description}
+            </Typography>
+          </Paper>
+        </Grid>
+        
+        <Grid item xs={12} md={6}>
+          <Paper 
+            elevation={3} 
+            sx={{ 
+              p: 3, 
+              borderRadius: 2,
+              backgroundColor: theme.palette.background.paper,
+              display: 'flex',
+              flexWrap: 'wrap',
+              justifyContent: 'center',
+              gap: 2
+            }}
+          >
+            {skillsData.map((skill, index) => {
+              const isSelected = index === selectedSkill;
 
-            return (
-              <div
-                key={index}
-                className={`skill-icon-container ${isSelected ? "selected" : ""}`}
-                onClick={() => setSelectedSkill(index)}
-                title={skill.name}
-              >
-                <span className="skill-icon">{skill.icon}</span>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    </section>
+              return (
+                <Tooltip key={index} title={skill.name} arrow>
+                  <IconButton
+                    onClick={() => setSelectedSkill(index)}
+                    sx={{
+                      width: 60,
+                      height: 60,
+                      fontSize: '1.8rem',
+                      color: isSelected ? theme.palette.primary.main : theme.palette.text.secondary,
+                      backgroundColor: isSelected 
+                        ? theme.palette.mode === 'dark' 
+                          ? 'rgba(255, 255, 255, 0.1)' 
+                          : 'rgba(0, 0, 0, 0.05)'
+                        : 'transparent',
+                      border: isSelected 
+                        ? `2px solid ${theme.palette.primary.main}` 
+                        : `2px solid transparent`,
+                      transition: 'all 0.3s ease',
+                      '&:hover': {
+                        backgroundColor: theme.palette.mode === 'dark' 
+                          ? 'rgba(255, 255, 255, 0.1)' 
+                          : 'rgba(0, 0, 0, 0.05)',
+                        transform: 'scale(1.1)',
+                      },
+                    }}
+                  >
+                    {skill.icon}
+                  </IconButton>
+                </Tooltip>
+              );
+            })}
+          </Paper>
+        </Grid>
+      </Grid>
+    </Section>
   );
 }
 

@@ -1,4 +1,4 @@
- .hero-section {
+.hero-section {
   padding-top: 5rem;
   min-height: 100vh;
   display: flex;
@@ -103,71 +103,304 @@
   box-shadow: 0 0 15px rgba(0, 68, 255, 0.7);
 }
 
-.orbit-icon {
+/* Estilos para o componente Hero */
+.hero-animated-bg {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 50px;
-  height: 50px;
-  background-color: rgb(7, 218, 255);
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.hero-animated-bg::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at center, rgba(0, 123, 255, 0.1) 0%, transparent 70%);
+  animation: pulse 15s infinite alternate;
+}
+
+.particle {
+  position: absolute;
   border-radius: 50%;
+  animation: float 20s infinite linear;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1.2);
+  }
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0) rotate(0deg);
+  }
+  100% {
+    transform: translateY(-100vh) rotate(360deg);
+  }
+}
+
+/* Efeito de digitação */
+.typing-effect {
+  border-right: 3px solid;
+  animation: blink 0.7s step-end infinite;
+}
+
+@keyframes blink {
+  from, to { border-color: transparent }
+  50% { border-color: currentColor }
+}
+
+/* Conteúdo principal */
+.hero-content {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  text-decoration: none;
-  color: #000;
-  font-size: 1.8rem;
-  z-index: 3;
-  transition: transform 0.2s, box-shadow 0.3s;
-  box-shadow: 0 0 10px rgba(7, 218, 255, 0.7);
 }
 
-.dark-mode .orbit-icon {
-  box-shadow: 0 0 10px rgba(0, 68, 255, 0.7);
-  background-color: rgba(0, 68, 255, 0.7);
-  color: #fff;
+/* Estilos para o título e subtítulo */
+.title-subtitle-container {
+  position: relative;
+  padding: 0.5rem 0;
 }
 
-@keyframes orbitGitHub {
+.hero-title {
+  position: relative;
+  display: inline-block;
+  transition: transform 0.3s ease;
+  margin-bottom: 0.5rem;
+}
+
+/* Linha divisória entre título e subtítulo */
+.title-divider {
+  height: 2px;
+  width: 140px;
+  margin: 0 auto;
+  background: linear-gradient(90deg, #007bff, #00c8d4);
+  transition: width 0.5s ease, opacity 0.5s ease;
+  border-radius: 2px;
+  position: relative;
+  overflow: hidden;
+}
+
+.title-divider::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+  animation: shimmer 2s infinite;
+}
+
+.title-divider.expanded {
+  width: 180px;
+}
+
+@keyframes shimmer {
   0% {
-    transform: translate(-50%, -50%) rotate(0deg) translate(180px) rotate(0deg);
+    left: -100%;
   }
   100% {
-    transform: translate(-50%, -50%) rotate(360deg) translate(180px) rotate(-360deg);
+    left: 100%;
   }
 }
-.orbit-github {
-  animation: orbitGitHub 22s linear infinite;
+
+.hero-subtitle {
+  position: relative;
+  display: inline-block;
+  transition: all 0.3s ease;
+  margin-top: 0.5rem;
 }
 
-@keyframes orbitLinkedin {
+.hero-subtitle:hover {
+  letter-spacing: 0.3px;
+}
+
+/* Estilos para o avatar */
+.hero-avatar {
+  transition: transform 0.5s ease, box-shadow 0.5s ease;
+  position: relative;
+}
+
+.hero-avatar::before {
+  content: '';
+  position: absolute;
+  top: -10px;
+  left: -10px;
+  right: -10px;
+  bottom: -10px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(0, 123, 255, 0.2), rgba(0, 200, 255, 0.2));
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.hero-avatar:hover {
+  transform: scale(1.03);
+}
+
+.hero-avatar:hover::before {
+  opacity: 1;
+}
+
+/* Ícones sociais */
+.hero-social-icon {
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-social-icon::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at center, rgba(255, 255, 255, 0.2) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.hero-social-icon:hover {
+  transform: translateY(-3px);
+}
+
+.hero-social-icon:hover::after {
+  opacity: 1;
+}
+
+/* Estilos para o card */
+.hero-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  overflow: hidden;
+  position: relative;
+}
+
+.hero-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle at center, rgba(0, 123, 255, 0.05) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  z-index: 0;
+}
+
+.hero-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.hero-card:hover::before {
+  opacity: 1;
+  animation: pulse-card 5s infinite alternate;
+}
+
+@keyframes pulse-card {
   0% {
-    transform: translate(-50%, -50%) rotate(0deg) translate(230px) rotate(0deg);
+    transform: scale(1);
   }
   100% {
-    transform: translate(-50%, -50%) rotate(360deg) translate(230px) rotate(-360deg);
+    transform: scale(1.2);
   }
-}
-.orbit-linkedin {
-  animation: orbitLinkedin 23s linear infinite;
 }
 
-@keyframes orbitInstagram {
-  0% {
-    transform: translate(-50%, -50%) rotate(0deg) translate(280px) rotate(0deg);
-  }
-  100% {
-    transform: translate(-50%, -50%) rotate(360deg) translate(280px) rotate(-360deg);
-  }
-}
-.orbit-instagram {
-  animation: orbitInstagram 24s linear infinite;
+/* Estilos para os botões */
+.button-contact {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
 }
 
-.orbit-icon:hover {
-  transform: scale(1.15);
-  background-color: rgb(0, 235, 215);
+.button-contact::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.1), transparent);
+  transition: all 0.5s ease;
 }
-.dark-mode .orbit-icon:hover {
-  background-color: rgba(0, 68, 255, 0.7);
+
+.button-contact:hover {
+  transform: translateY(-2px);
+}
+
+.button-contact:hover::before {
+  left: 100%;
+}
+
+.button-resume {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.button-resume::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: currentColor;
+  transition: width 0.3s ease;
+}
+
+.button-resume:hover {
+  transform: translateY(-2px);
+}
+
+.button-resume:hover::after {
+  width: 100%;
+}
+
+/* Responsividade */
+@media (max-width: 960px) {
+  .hero-title {
+    font-size: 2.5rem;
+  }
+  
+  .hero-subtitle {
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .hero-title {
+    font-size: 2rem;
+  }
+  
+  .hero-subtitle {
+    font-size: 1rem;
+  }
+  
+  .hero-buttons {
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+  }
+  
+  .hero-buttons .MuiButton-root {
+    width: 100%;
+    max-width: 280px;
+    margin-bottom: 8px;
+  }
 }

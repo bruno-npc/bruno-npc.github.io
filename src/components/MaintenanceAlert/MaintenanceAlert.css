@@ -1,0 +1,45 @@
+.maintenance-alert-dialog {
+  z-index: 2000;
+}
+
+.maintenance-alert-title {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  padding-bottom: 16px;
+}
+
+.maintenance-alert-message {
+  text-align: center;
+  line-height: 1.6;
+  margin-top: 16px;
+}
+
+.maintenance-alert-icon-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.maintenance-alert-icon {
+  font-size: 48px !important;
+  animation: pulse 2s infinite ease-in-out;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Ajustes para o tema escuro */
+body.dark-mode .maintenance-alert-title {
+  border-bottom-color: rgba(255, 255, 255, 0.1);
+} 

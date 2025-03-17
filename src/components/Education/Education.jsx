@@ -2,7 +2,18 @@ import React, { useState, useEffect } from "react";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../firebaseConfig";
 import localforage from "localforage";
-import "./Education.css";
+import { 
+  Box, 
+  Typography, 
+  Grid, 
+  Paper, 
+  List, 
+  ListItem, 
+  Divider,
+  useTheme,
+  CircularProgress
+} from "@mui/material";
+import { Section, Button } from "../../ui-components";
 
 const CACHE_KEY = "educationData";
 const ONE_HOUR = 60 * 60 * 1000;
@@ -10,6 +21,8 @@ const ONE_HOUR = 60 * 60 * 1000;
 function Education() {
   const [educations, setEducations] = useState([]);
   const [selectedEducation, setSelectedEducation] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const theme = useTheme();
 
   useEffect(() => {
     const fetchEducations = async () => {
@@ -22,6 +35,7 @@ function Education() {
             setSelectedEducation(cachedEducations[0]);
           }
           if (Date.now() - lastFetched < ONE_HOUR) {
+            setLoading(false);
             return;
           }
         }
@@ -42,6 +56,8 @@ function Education() {
         });
       } catch (error) {
         console.error("Erro ao buscar educations (público):", error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -63,60 +79,120 @@ function Education() {
 
   const renderDetails = (edu) => {
     if (edu.type === "Graduação") {
-      return <p>{edu.details}</p>;
+      return (
+        <Typography variant="body1" sx={{ mb: 2 }}>
+          {edu.details}
+        </Typography>
+      );
     } else {
       const items = edu.details ? edu.details.split(",") : [];
       return (
-        <ul>
+        <List sx={{ pl: 2 }}>
           {items.map((item, idx) => (
-            <li key={idx}>{item.trim()}</li>
+            <ListItem key={idx} sx={{ display: 'list-item', listStyleType: 'disc', py: 0.5 }}>
+              <Typography variant="body1">{item.trim()}</Typography>
+            </ListItem>
           ))}
-        </ul>
+        </List>
       );
     }
   };
 
   return (
-    <section id="education" className="education-section">
-      <div className="education-container">
-        <div className="education-list">
-          <h2>Educação</h2>
-          {educations.map((edu) => (
-            <div
-              key={edu.id}
-              className={`education-item ${
-                selectedEducation && selectedEducation.id === edu.id
-                  ? "active"
-                  : ""
-              }`}
-              onClick={() => setSelectedEducation(edu)}
+    <Section 
+      id="education" 
+      title="Educação"
+      bgColor={theme.palette.background.default}
+    >
+      {loading ? (
+        <Box sx={{ display: 'flex', justifyContent: 'center', my: 4 }}>
+          <CircularProgress />
+        </Box>
+      ) : (
+        <Grid container spacing={3}>
+          <Grid item xs={12} md={4}>
+            <Paper 
+              elevation={3} 
+              sx={{ 
+                p: 0, 
+                borderRadius: 2,
+                height: '100%',
+                backgroundColor: theme.palette.background.paper
+              }}
             >
-              <h3>{edu.name}</h3>
-              <span>{getPeriod(edu)}</span>
-            </div>
-          ))}
-        </div>
+              <List sx={{ p: 0 }}>
+                {educations.map((edu, index) => (
+                  <React.Fragment key={edu.id}>
+                    <ListItem 
+                      onClick={() => setSelectedEducation(edu)}
+                      sx={{ 
+                        p: 2,
+                        backgroundColor: selectedEducation && selectedEducation.id === edu.id 
+                          ? theme.palette.action.selected 
+                          : 'transparent',
+                        '&:hover': {
+                          backgroundColor: theme.palette.action.hover,
+                        },
+                        cursor: 'pointer'
+                      }}
+                    >
+                      <Box sx={{ width: '100%' }}>
+                        <Typography variant="h6" component="h3" gutterBottom>
+                          {edu.name}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          {getPeriod(edu)}
+                        </Typography>
+                      </Box>
+                    </ListItem>
+                    {index < educations.length - 1 && <Divider />}
+                  </React.Fragment>
+                ))}
+              </List>
+            </Paper>
+          </Grid>
 
-        {selectedEducation && (
-          <div className="education-details">
-            <h3>{selectedEducation.name}</h3>
-            <p>
-              <strong>Período:</strong> {getPeriod(selectedEducation)}
-            </p>
-            {renderDetails(selectedEducation)}
-            {selectedEducation.link && (
-              <a
-                href={selectedEducation.link}
-                target="_blank"
-                rel="noreferrer"
+          {selectedEducation && (
+            <Grid item xs={12} md={8}>
+              <Paper 
+                elevation={3} 
+                sx={{ 
+                  p: 3, 
+                  borderRadius: 2,
+                  height: '100%',
+                  backgroundColor: theme.palette.background.paper
+                }}
               >
-                <button className="btn btn-primary">Acessar Cursos</button>
-              </a>
-            )}
-          </div>
-        )}
-      </div>
-    </section>
+                <Typography variant="h5" component="h3" gutterBottom>
+                  {selectedEducation.name}
+                </Typography>
+                
+                <Typography variant="body1" sx={{ mb: 2 }}>
+                  <strong>Período:</strong> {getPeriod(selectedEducation)}
+                </Typography>
+                
+                {renderDetails(selectedEducation)}
+                
+                {selectedEducation.link && (
+                  <Box sx={{ mt: 3 }}>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      component="a"
+                      href={selectedEducation.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Acessar Cursos
+                    </Button>
+                  </Box>
+                )}
+              </Paper>
+            </Grid>
+          )}
+        </Grid>
+      )}
+    </Section>
   );
 }
 

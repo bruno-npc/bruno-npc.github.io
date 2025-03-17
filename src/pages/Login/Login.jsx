@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Container, Form, Button, Alert } from "react-bootstrap";
+import { Container, Form, Button, Alert, Card } from "react-bootstrap";
 import { auth } from "../../firebaseConfig";
 import { signInWithEmailAndPassword } from "firebase/auth";
+import { InfoOutlined } from "@mui/icons-material";
 import "./Login.css";
 
 function Login() {
@@ -27,6 +28,19 @@ function Login() {
     <section className="login-section">
       <Container className="login-container">
         <h2 className="text-center mb-4">Login</h2>
+
+        {/* Mensagem informativa */}
+        <Card className="info-card mb-4">
+          <Card.Body>
+            <div className="d-flex align-items-center mb-2">
+              <InfoOutlined className="info-icon me-2" />
+              <h5 className="mb-0">Acesso Restrito</h5>
+            </div>
+            <p className="mb-0">
+              Esta área é exclusiva para o proprietário do portfólio. Apenas o administrador possui permissão para realizar atualizações no sistema.
+            </p>
+          </Card.Body>
+        </Card>
 
         {error && <Alert variant="danger">{error}</Alert>}
 
