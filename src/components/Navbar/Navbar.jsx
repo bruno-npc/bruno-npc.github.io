@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useMemo, memo } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { 
   AppBar, 
@@ -32,7 +32,7 @@ import { signOut } from "firebase/auth";
 import { auth } from "../../firebaseConfig";
 import "./Navbar.css";
 
-// Lista de navegação
+// Lista de navegação - Definida fora do componente para evitar recriação
 const navItems = [
   { id: "home", label: "Início", icon: <Home /> },
   { id: "skills", label: "Conhecimentos", icon: <Code /> },
@@ -42,7 +42,7 @@ const navItems = [
   { id: "contact", label: "Contato", icon: <Email /> },
 ];
 
-function Navbar({ isDarkMode, onToggleDarkMode, user }) {
+const Navbar = memo(({ isDarkMode, onToggleDarkMode, user }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("home");
   const navigate = useNavigate();
@@ -54,23 +54,31 @@ function Navbar({ isDarkMode, onToggleDarkMode, user }) {
   useEffect(() => {
     if (!isHomePage) return;
 
+    // Função mais eficiente usando requestAnimationFrame
+    let ticking = false;
     const handleScroll = () => {
-      const scrollPosition = window.scrollY + 100; // Offset para detecção mais precisa
-      
-      // Encontra a seção atual
-      const sections = navItems.map(item => document.getElementById(item.id));
-      
-      for (let i = sections.length - 1; i >= 0; i--) {
-        const section = sections[i];
-        if (section && scrollPosition >= section.offsetTop) {
-          setActiveSection(navItems[i].id);
-          break;
-        }
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const scrollPosition = window.scrollY + 100; // Offset para detecção mais precisa
+          
+          // Encontra a seção atual
+          const sections = navItems.map(item => document.getElementById(item.id));
+          
+          for (let i = sections.length - 1; i >= 0; i--) {
+            const section = sections[i];
+            if (section && scrollPosition >= section.offsetTop) {
+              setActiveSection(navItems[i].id);
+              break;
+            }
+          }
+          ticking = false;
+        });
+        ticking = true;
       }
     };
 
-    // Adiciona listener de scroll
-    window.addEventListener('scroll', handleScroll);
+    // Adiciona listener de scroll com passive: true para melhor desempenho
+    window.addEventListener('scroll', handleScroll, { passive: true });
     
     // Executa uma vez para definir a seção inicial
     handleScroll();
@@ -79,8 +87,8 @@ function Navbar({ isDarkMode, onToggleDarkMode, user }) {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [isHomePage]);
 
-  // Navegação para a seção na página inicial
-  const handleNavigation = (sectionId) => {
+  // Navegação para a seção na página inicial - memoizada
+  const handleNavigation = useCallback((sectionId) => {
     if (isHomePage) {
       scrollToSection(sectionId);
     } else {
@@ -93,10 +101,10 @@ function Navbar({ isDarkMode, onToggleDarkMode, user }) {
         }
       }, 100);
     }
-  };
+  }, [isHomePage, navigate]);
 
-  // Função para rolar até uma seção específica
-  const scrollToSection = (sectionId) => {
+  // Função para rolar até uma seção específica - memoizada
+  const scrollToSection = useCallback((sectionId) => {
     const section = document.getElementById(sectionId);
     
     if (section) {
@@ -115,16 +123,16 @@ function Navbar({ isDarkMode, onToggleDarkMode, user }) {
       setActiveSection(sectionId);
       setMobileOpen(false); // Fecha o menu mobile se estiver aberto
     }
-  };
+  }, []);
 
-  // Navegação para página de login
-  const handleLoginClick = () => {
+  // Navegação para página de login - memoizada
+  const handleLoginClick = useCallback(() => {
     navigate("/login");
     setMobileOpen(false);
-  };
+  }, [navigate]);
 
-  // Navegação para página admin (apenas se estiver logado)
-  const handleAdminClick = () => {
+  // Navegação para página admin (apenas se estiver logado) - memoizada
+  const handleAdminClick = useCallback(() => {
     if (user) {
       // Verifica se o token ainda é válido antes de navegar
       user.getIdToken(true)
@@ -141,10 +149,10 @@ function Navbar({ isDarkMode, onToggleDarkMode, user }) {
           });
         });
     }
-  };
+  }, [user, navigate]);
 
-  // Logout
-  const handleLogout = async () => {
+  // Logout - memoizado
+  const handleLogout = useCallback(async () => {
     try {
       await signOut(auth);
       // Se estiver na página admin, redireciona para home
@@ -155,16 +163,16 @@ function Navbar({ isDarkMode, onToggleDarkMode, user }) {
     } catch (error) {
       console.error("Erro ao fazer logout:", error);
     }
-  };
+  }, [location.pathname, navigate]);
 
-  // Navegação para página inicial
-  const handleHomeClick = () => {
+  // Navegação para página inicial - memoizada
+  const handleHomeClick = useCallback(() => {
     navigate("/");
     setMobileOpen(false);
-  };
+  }, [navigate]);
 
-  // Drawer para dispositivos móveis
-  const drawer = (
+  // Drawer para dispositivos móveis - memoizado para evitar re-renders
+  const drawer = useMemo(() => (
     <Box className="navbar-drawer">
       <Box className="drawer-header">
         <IconButton onClick={() => setMobileOpen(false)} className="drawer-close-btn">
@@ -232,7 +240,12 @@ function Navbar({ isDarkMode, onToggleDarkMode, user }) {
         )}
       </List>
     </Box>
-  );
+  ), [isHomePage, location.pathname, activeSection, user, handleHomeClick, handleNavigation, handleLoginClick, handleAdminClick, handleLogout]);
+
+  // Função para abrir o menu mobile - memoizada
+  const toggleMobileMenu = useCallback(() => {
+    setMobileOpen(prev => !prev);
+  }, []);
 
   return (
     <>
@@ -244,7 +257,7 @@ function Navbar({ isDarkMode, onToggleDarkMode, user }) {
               color="inherit"
               aria-label="open drawer"
               edge="start"
-              onClick={() => setMobileOpen(true)}
+              onClick={toggleMobileMenu}
               className="navbar-menu-button"
               sx={{ display: { sm: 'none' } }}
             >
@@ -334,7 +347,7 @@ function Navbar({ isDarkMode, onToggleDarkMode, user }) {
       <Drawer
         anchor="left"
         open={mobileOpen}
-        onClose={() => setMobileOpen(false)}
+        onClose={toggleMobileMenu}
         ModalProps={{ keepMounted: true }}
         sx={{
           display: { xs: 'block', sm: 'none' },
@@ -348,6 +361,6 @@ function Navbar({ isDarkMode, onToggleDarkMode, user }) {
       <Box sx={{ height: { xs: '60px', sm: '64px' } }} />
     </>
   );
-}
+});
 
 export default Navbar;

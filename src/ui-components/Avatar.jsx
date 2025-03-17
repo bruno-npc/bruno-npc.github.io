@@ -1,97 +1,138 @@
-import React from 'react';
-import { Avatar as MuiAvatar, Badge } from '@mui/material';
+import React, { memo, useState, useEffect } from 'react';
 import { styled } from '@mui/material/styles';
+import { CircularProgress } from '@mui/material';
 
-// Avatar estilizado com base no MUI Avatar
-const StyledAvatar = styled(MuiAvatar)(({ theme, size = 'medium', $glow = false, $glowColor = 'primary' }) => {
-  const sizes = {
-    small: 40,
-    medium: 60,
-    large: 100,
-    xlarge: 150,
-    xxlarge: 200,
-  };
-  
-  const actualSize = typeof size === 'number' ? size : sizes[size] || sizes.medium;
-  
-  return {
-    width: actualSize,
-    height: actualSize,
-    boxShadow: $glow ? `0 0 15px ${theme.palette[$glowColor]?.main || theme.palette.primary.main}` : 'none',
-    border: $glow ? `3px solid ${theme.palette[$glowColor]?.main || theme.palette.primary.main}` : 'none',
-    transition: 'all 0.3s ease',
-    '&:hover': {
-      transform: 'scale(1.05)',
-    },
-  };
-});
+// Tamanhos de avatar predefinidos
+const sizes = {
+  small: { width: '40px', height: '40px' },
+  medium: { width: '60px', height: '60px' },
+  large: { width: '100px', height: '100px' },
+  xlarge: { width: '150px', height: '150px' },
+  xxlarge: { width: '200px', height: '200px' },
+};
 
-// Badge estilizada para o avatar
-const StyledBadge = styled(Badge)(({ theme, $badgeColor = 'success' }) => ({
-  '& .MuiBadge-badge': {
-    backgroundColor: theme.palette[$badgeColor]?.main || '#44b700',
-    color: theme.palette[$badgeColor]?.contrastText || '#fff',
-    boxShadow: `0 0 0 2px ${theme.palette.background.paper}`,
-    '&::after': {
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      width: '100%',
-      height: '100%',
-      borderRadius: '50%',
-      animation: 'ripple 1.2s infinite ease-in-out',
-      border: '1px solid currentColor',
-      content: '""',
-    },
-  },
-  '@keyframes ripple': {
-    '0%': {
-      transform: 'scale(.8)',
-      opacity: 1,
-    },
-    '100%': {
-      transform: 'scale(2.4)',
-      opacity: 0,
-    },
-  },
+// Avatar estilizado
+const StyledAvatar = styled('div')(({ theme, $size, $isLoading }) => ({
+  position: 'relative',
+  width: typeof $size === 'object' ? $size.width : (sizes[$size] ? sizes[$size].width : sizes.medium.width),
+  height: typeof $size === 'object' ? $size.height : (sizes[$size] ? sizes[$size].height : sizes.medium.height),
+  borderRadius: '50%',
+  overflow: 'hidden',
+  backgroundColor: $isLoading ? 'transparent' : theme.palette.grey[300],
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
 }));
 
-// Componente de avatar personalizado
-const Avatar = ({
-  src,
-  alt = 'Avatar',
-  size = 'medium',
-  glow = false,
-  glowColor = 'primary',
-  badge = false,
-  badgeColor = 'success',
-  ...props
+// Imagem estilizada com renderização otimizada
+const StyledImage = styled('img')(({ $loaded }) => ({
+  width: '100%',
+  height: '100%',
+  objectFit: 'cover',
+  display: $loaded ? 'block' : 'none',
+  transform: 'translateZ(0)', // Hardware acceleration
+  willChange: 'opacity', // Avisar ao navegador que esta propriedade será animada
+  backfaceVisibility: 'hidden',
+}));
+
+// Componente Avatar
+const Avatar = memo(({ 
+  src, 
+  alt = 'Avatar', 
+  size = 'medium', 
+  className = '', 
+  sx = {} 
 }) => {
-  const avatar = (
-    <StyledAvatar
-      src={src}
-      alt={alt}
-      size={size}
-      $glow={glow}
-      $glowColor={glowColor}
-      {...props}
-    />
+  const [loaded, setLoaded] = useState(false);
+  const [error, setError] = useState(false);
+  
+  // Verificar se a imagem já está em cache do navegador
+  useEffect(() => {
+    // Verificar se a imagem já está no cache
+    if (src) {
+      const img = new Image();
+      img.src = src;
+      
+      if (img.complete) {
+        setLoaded(true);
+      }
+    }
+  }, [src]);
+
+  // Funções para tratamento do carregamento
+  const handleLoad = () => {
+    setLoaded(true);
+  };
+
+  const handleError = () => {
+    setError(true);
+    setLoaded(true);
+  };
+
+  // Calcular largura para parâmetro 'sizes' do img
+  const getImageSizes = () => {
+    let width;
+    
+    if (typeof size === 'object') {
+      width = parseInt(size.width, 10);
+    } else {
+      width = parseInt(sizes[size]?.width || sizes.medium.width, 10);
+    }
+    
+    return `(max-width: 600px) ${width / 2}px, ${width}px`;
+  };
+
+  return (
+    <StyledAvatar 
+      $size={size} 
+      className={className} 
+      sx={sx}
+      $isLoading={!loaded} 
+    >
+      {!loaded && (
+        <CircularProgress 
+          size={
+            typeof size === 'object' 
+              ? Math.min(parseInt(size.width, 10), parseInt(size.height, 10)) / 3 
+              : parseInt(sizes[size]?.width || sizes.medium.width, 10) / 3
+          } 
+        />
+      )}
+
+      {/* Apenas para mostrar placeholder em caso de erro */}
+      {error && loaded && (
+        <div 
+          style={{ 
+            width: '100%', 
+            height: '100%', 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center',
+            backgroundColor: '#e1e1e1',
+            color: '#666',
+            fontSize: '1rem'
+          }}
+        >
+          {alt.charAt(0).toUpperCase()}
+        </div>
+      )}
+
+      {/* Carregamento otimizado de imagem */}
+      {src && !error && (
+        <StyledImage
+          src={src}
+          alt={alt}
+          loading="eager" // Carregar com alta prioridade para elementos visíveis inicialmente
+          decoding="async" // Permite decodificação assíncrona
+          fetchPriority="high" // Prioridade alta para imagens importantes
+          sizes={getImageSizes()}
+          onLoad={handleLoad}
+          onError={handleError}
+          $loaded={loaded}
+        />
+      )}
+    </StyledAvatar>
   );
-
-  if (badge) {
-    return (
-      <StyledBadge
-        overlap="circular"
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-        variant="dot"
-        $badgeColor={badgeColor}
-      >
-        {avatar}
-      </StyledBadge>
-    );
-  }
-
-  return avatar;
-};
+});
 
 export default Avatar; 

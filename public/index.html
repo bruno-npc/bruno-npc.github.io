@@ -1,15 +1,25 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
   <head>
     <meta charset="utf-8" />
-    <title>Meu Portfólio</title>
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <!-- 
-      Você não precisa importar o CSS do Bootstrap aqui
-      pois faremos via import no index.js 
-    -->
+    <meta name="theme-color" content="#000000" />
+    <meta
+      name="description"
+      content="Portfólio de Bruno - Desenvolvedor Full-Stack"
+    />
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+    
+    <!-- Pré-carregamento de recursos críticos -->
+    <link rel="preload" as="image" href="%PUBLIC_URL%/static/media/perfil.jpeg" />
+    
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    
+    <title>Bruno - Portfólio</title>
   </head>
   <body>
+    <noscript>Você precisa habilitar o JavaScript para executar este aplicativo.</noscript>
     <div id="root"></div>
   </body>
 </html>
