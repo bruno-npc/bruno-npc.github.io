@@ -24,6 +24,7 @@ import ProjectsList from "../../components/ProjectsProfile/ProjectsList";
 import EducationList from "../../components/EducationProfile/EducationList";
 import ExperiencesList from "../../components/ExperiencesProfile/ExperiencesList";
 import SkillsList from "../../components/SkillsProfile/SkillsList";
+import SiteSettings from "../../components/SiteSettings/SiteSettings";
 
 function Admin() {
   const navigate = useNavigate();
@@ -168,6 +169,9 @@ function Admin() {
           </Tab>
           <Tab eventKey="skills" title="Skills">
             <SkillsList />
+          </Tab>
+          <Tab eventKey="configuracoes" title="Configurações">
+            <SiteSettings />
           </Tab>
         </Tabs>
       </Paper>

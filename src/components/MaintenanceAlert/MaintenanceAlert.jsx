@@ -16,6 +16,7 @@ import {
   Construction as ConstructionIcon
 } from '@mui/icons-material';
 import { firebaseInitializationError, isFirebaseConfigured } from '../../firebaseConfig';
+import { DEFAULT_SITE_SETTINGS, getSiteSettings } from '../../services/siteSettings';
 import './MaintenanceAlert.css';
 
 function MaintenanceAlert() {
@@ -23,10 +24,13 @@ function MaintenanceAlert() {
   const [isDatabaseUnavailable, setIsDatabaseUnavailable] = useState(hasFirebaseIssue);
   const [open, setOpen] = useState(hasFirebaseIssue);
   const [dontShowAgain, setDontShowAgain] = useState(false);
+  const [settings, setSettings] = useState(DEFAULT_SITE_SETTINGS.maintenance);
   const theme = useTheme();
   const shouldForceMaintenance = isDatabaseUnavailable;
 
   useEffect(() => {
+    getSiteSettings().then((siteSettings) => setSettings(siteSettings.maintenance));
+
     const handleDatabaseUnavailable = () => {
       setIsDatabaseUnavailable(true);
       setOpen(true);
@@ -72,13 +76,9 @@ function MaintenanceAlert() {
     return null;
   }
 
-  const title = shouldForceMaintenance ? 'Site em Manutenção' : 'Site em Desenvolvimento';
-  const mainMessage = shouldForceMaintenance
-    ? 'Estou reconstruindo a base de dados do portfólio. Algumas seções podem aparecer vazias ou temporariamente indisponíveis.'
-    : 'Obrigado por visitar! Este site está atualmente em fase de manutenção e desenvolvimento. Algumas funcionalidades podem não estar completas ou podem apresentar comportamentos inesperados.';
-  const secondaryMessage = shouldForceMaintenance
-    ? 'Volte em breve para ver os projetos, experiências e demais informações atualizadas.'
-    : 'Agradecemos sua compreensão enquanto trabalhamos para melhorar sua experiência.';
+  const title = shouldForceMaintenance ? settings.databaseTitle : settings.developmentTitle;
+  const mainMessage = shouldForceMaintenance ? settings.databaseMessage : settings.developmentMessage;
+  const secondaryMessage = shouldForceMaintenance ? settings.databaseFooter : settings.developmentFooter;
 
   return (
     <Dialog

@@ -8,6 +8,12 @@ function Profile() {
   const [aboutTitle, setAboutTitle] = useState("");
   const [aboutSubtitle, setAboutSubtitle] = useState("");
   const [aboutDescription, setAboutDescription] = useState("");
+  const [profileImageUrl, setProfileImageUrl] = useState("");
+  const [resumeUrl, setResumeUrl] = useState("");
+  const [githubUrl, setGithubUrl] = useState("");
+  const [linkedinUrl, setLinkedinUrl] = useState("");
+  const [instagramUrl, setInstagramUrl] = useState("");
+  const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
 
   const docId = "meuPerfil";
@@ -15,6 +21,8 @@ function Profile() {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        if (!db) return;
+
         const ref = doc(db, "profileData", docId);
         const snap = await getDoc(ref);
         if (snap.exists()) {
@@ -22,6 +30,12 @@ function Profile() {
           setAboutTitle(data.aboutTitle || "");
           setAboutSubtitle(data.aboutSubtitle || "");
           setAboutDescription(data.aboutDescription || "");
+          setProfileImageUrl(data.profileImageUrl || "");
+          setResumeUrl(data.resumeUrl || "");
+          setGithubUrl(data.socialLinks?.github || "");
+          setLinkedinUrl(data.socialLinks?.linkedin || "");
+          setInstagramUrl(data.socialLinks?.instagram || "");
+          setEmail(data.socialLinks?.email || "");
         }
       } catch (error) {
         console.error("Erro ao buscar perfil:", error);
@@ -32,11 +46,23 @@ function Profile() {
 
   const handleSave = async () => {
     try {
+      if (!db) {
+        throw new Error("Firebase indisponível.");
+      }
+
       const ref = doc(db, "profileData", docId);
       await setDoc(ref, {
         aboutTitle,
         aboutSubtitle,
-        aboutDescription
+        aboutDescription,
+        profileImageUrl,
+        resumeUrl,
+        socialLinks: {
+          github: githubUrl,
+          linkedin: linkedinUrl,
+          instagram: instagramUrl,
+          email,
+        },
       });
 
       setMessage("Perfil atualizado com sucesso!");
@@ -60,6 +86,7 @@ function Profile() {
             placeholder="Ex: Bruno Souza"
           />
         </Form.Group>
+
         <Form.Group className="mt-3">
           <Form.Label>Subtítulo</Form.Label>
           <Form.Control
@@ -78,6 +105,66 @@ function Profile() {
             value={aboutDescription}
             onChange={(e) => setAboutDescription(e.target.value)}
             placeholder="Fale um pouco sobre você..."
+          />
+        </Form.Group>
+
+        <Form.Group className="mt-3">
+          <Form.Label>URL da foto de perfil</Form.Label>
+          <Form.Control
+            type="url"
+            value={profileImageUrl}
+            onChange={(e) => setProfileImageUrl(e.target.value)}
+            placeholder="https://..."
+          />
+        </Form.Group>
+
+        <Form.Group className="mt-3">
+          <Form.Label>URL do currículo</Form.Label>
+          <Form.Control
+            type="url"
+            value={resumeUrl}
+            onChange={(e) => setResumeUrl(e.target.value)}
+            placeholder="https://drive.google.com/..."
+          />
+        </Form.Group>
+
+        <Form.Group className="mt-3">
+          <Form.Label>GitHub</Form.Label>
+          <Form.Control
+            type="url"
+            value={githubUrl}
+            onChange={(e) => setGithubUrl(e.target.value)}
+            placeholder="https://github.com/seu-usuario"
+          />
+        </Form.Group>
+
+        <Form.Group className="mt-3">
+          <Form.Label>LinkedIn</Form.Label>
+          <Form.Control
+            type="url"
+            value={linkedinUrl}
+            onChange={(e) => setLinkedinUrl(e.target.value)}
+            placeholder="https://www.linkedin.com/in/seu-usuario"
+          />
+        </Form.Group>
+
+        <Form.Group className="mt-3">
+          <Form.Label>Instagram</Form.Label>
+          <Form.Control
+            type="url"
+            value={instagramUrl}
+            onChange={(e) => setInstagramUrl(e.target.value)}
+            placeholder="https://www.instagram.com/seu-usuario"
+          />
+        </Form.Group>
+
+        <Form.Group className="mt-3">
+          <Form.Label>Email</Form.Label>
+          <Form.Control
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="seu-email@dominio.com"
           />
         </Form.Group>
 

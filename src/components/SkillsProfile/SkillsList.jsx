@@ -4,13 +4,7 @@ import { collection, getDocs, deleteDoc, doc } from "firebase/firestore";
 import { db } from "../../firebaseConfig";
 import SkillsModal from "./modalSkills/ModalSkills";
 import "./SkillsList.css";
-import { FaReact, FaNodeJs, FaPython, FaHtml5 } from "react-icons/fa";
-const iconMap = {
-  FaReact: FaReact,
-  FaNodeJs: FaNodeJs,
-  FaPython: FaPython,
-  FaHtml5: FaHtml5,
-};
+import { getIconComponent } from "../../utils/iconRegistry";
 
 function SkillsList() {
   const [skills, setSkills] = useState([]);
@@ -79,11 +73,14 @@ function SkillsList() {
         </thead>
         <tbody>
           {skills.map((skill) => {
-            const IconComponent = iconMap[skill.icon] || null;
+            const IconComponent = getIconComponent(skill.icon);
+            const description = Array.isArray(skill.descriptions)
+              ? skill.descriptions.filter(Boolean).join(" / ")
+              : skill.description;
             return (
               <tr key={skill.id}>
-                <td>{skill.name}</td>
-                <td>{skill.description}</td>
+                <td>{skill.title || skill.name}</td>
+                <td>{description}</td>
                 <td>
                   {/* Se skill.icon existir no map, exibe o componente */}
                   {IconComponent && <IconComponent size={24} />}

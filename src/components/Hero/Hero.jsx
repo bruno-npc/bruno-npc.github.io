@@ -21,13 +21,11 @@ import {
   Download, 
   Email
 } from "@mui/icons-material";
-import { Button, Avatar, SocialIcon } from "../../ui-components";
+import { Button, SocialIcon } from "../../ui-components";
 // Importação direta da imagem (que será incluída no bundle principal)
 import profilePic from "../../assets/perfil.jpeg";
 import "./Hero.css";
 
-
-const RESUME_URL = "https://drive.google.com/file/d/1EAkzmWxdLo6CWAH9z4z_S9ztYf_eIx86/view?usp=sharing";
 
 // Pré-carregar a imagem de perfil para torná-la disponível imediatamente
 const profileImage = new Image();
@@ -83,15 +81,16 @@ const AnimatedBackground = memo(({ theme }) => {
 });
 
 // Avatar otimizado inline para este componente específico (para a imagem de perfil)
-const OptimizedAvatar = memo(({ size, theme, className, sx }) => {
+const OptimizedAvatar = memo(({ size, theme, className, imageUrl, sx }) => {
   const [imageLoaded, setImageLoaded] = useState(false);
+  const finalImageUrl = imageUrl || profilePic;
   
   useEffect(() => {
     // Se a imagem já estiver no cache do navegador
-    if (profileImage.complete) {
+    if (!imageUrl && profileImage.complete) {
       setImageLoaded(true);
     }
-  }, []);
+  }, [imageUrl]);
   
   // Manipulador para quando a imagem de alta qualidade carregar
   const handleImageLoaded = () => {
@@ -105,7 +104,7 @@ const OptimizedAvatar = memo(({ size, theme, className, sx }) => {
         width: size === 'xlarge' ? '150px' : '200px',
         height: size === 'xlarge' ? '150px' : '200px',
         // Usar a versão em baixa qualidade como fallback e depois substituir pela alta qualidade
-        backgroundImage: `url(${imageLoaded ? profilePic : profilePicLQIP})`,
+        backgroundImage: `url(${imageLoaded ? finalImageUrl : profilePicLQIP})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         borderRadius: '50%',
@@ -120,7 +119,7 @@ const OptimizedAvatar = memo(({ size, theme, className, sx }) => {
     >
       {/* Imagem oculta para pré-carregar */}
       <img 
-        src={profilePic} 
+        src={finalImageUrl} 
         alt="Pré-carregando" 
         style={{ display: 'none' }} 
         onLoad={handleImageLoaded}
@@ -257,7 +256,10 @@ function Hero() {
   const [profileData, setProfileData] = useState({
     aboutTitle: "",
     aboutSubtitle: "",
-    aboutDescription: ""
+    aboutDescription: "",
+    profileImageUrl: "",
+    resumeUrl: "",
+    socialLinks: {}
   });
   const [isLoaded, setIsLoaded] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
@@ -271,12 +273,15 @@ function Hero() {
   });
 
   // Memoizar os links sociais para evitar recriação em cada render
-  const socialLinks = useMemo(() => [
-    { icon: <GitHub />, href: "https://github.com/bruno-npc", tooltip: "GitHub" },
-    { icon: <LinkedIn />, href: "https://www.linkedin.com/in/bruno-npc", tooltip: "LinkedIn" },
-    { icon: <Instagram />, href: "https://www.instagram.com/bruno_npc", tooltip: "Instagram" },
-    { icon: <Email />, href: "mailto:brunosznorth@gmail.com", tooltip: "Email" }
-  ], []);
+  const socialLinks = useMemo(() => {
+    const links = profileData.socialLinks || {};
+    return [
+      { icon: <GitHub />, href: links.github, tooltip: "GitHub" },
+      { icon: <LinkedIn />, href: links.linkedin, tooltip: "LinkedIn" },
+      { icon: <Instagram />, href: links.instagram, tooltip: "Instagram" },
+      { icon: <Email />, href: links.email ? `mailto:${links.email}` : "", tooltip: "Email" }
+    ].filter((social) => social.href);
+  }, [profileData.socialLinks]);
 
   // Otimizar a função de busca de dados para usar useCallback
   const fetchProfileData = useCallback(async () => {
@@ -304,7 +309,10 @@ function Hero() {
           const newProfileData = {
             aboutTitle: data.aboutTitle || "",
             aboutSubtitle: data.aboutSubtitle || "",
-            aboutDescription: data.aboutDescription || ""
+            aboutDescription: data.aboutDescription || "",
+            profileImageUrl: data.profileImageUrl || "",
+            resumeUrl: data.resumeUrl || "",
+            socialLinks: data.socialLinks || {}
           };
           
           // Só atualizar o estado e o cache se os dados forem diferentes
@@ -374,6 +382,7 @@ function Hero() {
                 size={isSmall ? 'xlarge' : 'xxlarge'}
                 theme={theme}
                 className="hero-avatar"
+                imageUrl={profileData.profileImageUrl}
               />
               
               <Stack 
@@ -494,10 +503,11 @@ function Hero() {
                 size="large"
                 startIcon={<Download />}
                 component="a"
-                href={RESUME_URL}
+                href={profileData.resumeUrl || undefined}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="button-resume"
+                disabled={!profileData.resumeUrl}
                 sx={{
                   px: 3,
                   py: 1,

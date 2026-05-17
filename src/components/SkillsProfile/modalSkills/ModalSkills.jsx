@@ -2,20 +2,8 @@ import React, { useState, useEffect } from "react";
 import { Modal, Form, Button, InputGroup } from "react-bootstrap";
 import { db } from "../../../firebaseConfig";
 import { collection, addDoc, updateDoc, doc } from "firebase/firestore";
+import { iconNames } from "../../../utils/iconRegistry";
 import "./ModalSkills.css";
-
-const allIcons = [
-  "FaReact",
-  "FaNodeJs",
-  "FaPython",
-  "FaHtml5",
-  "FaJava",
-  "FaAws",
-  "FaDocker",
-  "FaDatabase",
-  "FaAngular",
-  "FaVuejs",
-];
 
 function SkillsModal({ show, handleClose, editingSkill }) {
 
@@ -92,7 +80,7 @@ function SkillsModal({ show, handleClose, editingSkill }) {
     setTags(tags.filter((t) => t !== tagToRemove));
   };
 
-  const filteredIcons = allIcons.filter((iconName) =>
+  const filteredIcons = iconNames.filter((iconName) =>
     iconName.toLowerCase().includes(iconSearch.toLowerCase())
   );
 

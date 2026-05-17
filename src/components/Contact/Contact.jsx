@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { 
   Grid, 
   Paper, 
@@ -10,6 +10,7 @@ import {
 import { Email, Person, Message } from "@mui/icons-material";
 import { Section, TextField, Button } from "../../ui-components";
 import emailjs from '@emailjs/browser';
+import { DEFAULT_SITE_SETTINGS, getSiteSettings } from "../../services/siteSettings";
 
 function Contact() {
   const [formData, setFormData] = useState({ name: "", email: "", message: "" });
@@ -19,8 +20,13 @@ function Contact() {
     message: '',
     severity: 'success'
   });
+  const [settings, setSettings] = useState(DEFAULT_SITE_SETTINGS.contact);
   const formRef = useRef();
   const theme = useTheme();
+
+  useEffect(() => {
+    getSiteSettings().then((siteSettings) => setSettings(siteSettings.contact));
+  }, []);
 
   const handleChange = (e) => {
     const fieldMap = {
@@ -42,10 +48,13 @@ function Contact() {
     setLoading(true);
     
     try {
-      // Substitua estes valores pelos seus IDs do EmailJS
-      const serviceId = 'service_id'; // Seu Service ID do EmailJS
-      const templateId = 'template_id'; // Seu Template ID do EmailJS
-      const publicKey = 'public_key'; // Sua Public Key do EmailJS
+      const serviceId = settings.emailJsServiceId;
+      const templateId = settings.emailJsTemplateId;
+      const publicKey = settings.emailJsPublicKey;
+
+      if (!serviceId || !templateId || !publicKey) {
+        throw new Error("EmailJS não configurado.");
+      }
       
       const result = await emailjs.sendForm(
         serviceId,
@@ -57,7 +66,7 @@ function Contact() {
       console.log('Email enviado com sucesso!', result.text);
       setSnackbar({
         open: true,
-        message: 'Mensagem enviada com sucesso! Entrarei em contato em breve.',
+        message: settings.successMessage,
         severity: 'success'
       });
       
@@ -67,7 +76,7 @@ function Contact() {
       console.error('Erro ao enviar email:', error);
       setSnackbar({
         open: true,
-        message: 'Erro ao enviar mensagem. Por favor, tente novamente mais tarde.',
+        message: settings.errorMessage,
         severity: 'error'
       });
     } finally {
@@ -78,8 +87,8 @@ function Contact() {
   return (
     <Section 
       id="contact" 
-      title="Contato"
-      subtitle="Entre em contato comigo para discutir projetos ou oportunidades"
+      title={settings.title}
+      subtitle={settings.subtitle}
       bgColor={theme.palette.background.default}
     >
       <Grid container justifyContent="center">
