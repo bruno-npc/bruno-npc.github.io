@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { collection, getDocs } from "firebase/firestore";
-import { db } from "../../firebaseConfig";
+import { db, reportDatabaseUnavailable } from "../../firebaseConfig";
 import localforage from "localforage";
 import { 
   Box, 
@@ -40,6 +40,10 @@ function Education() {
           }
         }
 
+        if (!db) {
+          throw new Error("Firebase indisponível.");
+        }
+
         const querySnapshot = await getDocs(collection(db, "educations"));
         const list = [];
         querySnapshot.forEach((docSnap) => {
@@ -56,6 +60,7 @@ function Education() {
         });
       } catch (error) {
         console.error("Erro ao buscar educations (público):", error);
+        reportDatabaseUnavailable(error);
       } finally {
         setLoading(false);
       }

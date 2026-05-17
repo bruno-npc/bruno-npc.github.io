@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { doc, getDoc } from "firebase/firestore";
-import { db } from "../../firebaseConfig";
+import { db, reportDatabaseUnavailable } from "../../firebaseConfig";
 import { Spinner, Alert, Button, Carousel } from "react-bootstrap";
 import "./ProjectDetails.css";
 
@@ -14,6 +14,10 @@ function ProjectDetails() {
   useEffect(() => {
     const fetchProject = async () => {
       try {
+        if (!db) {
+          throw new Error("Firebase indisponível.");
+        }
+
         const docRef = doc(db, "projetos", id);
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
@@ -23,6 +27,7 @@ function ProjectDetails() {
         }
       } catch (err) {
         console.error("Erro ao buscar projeto:", err);
+        reportDatabaseUnavailable(err);
         setError("Erro ao carregar projeto.");
       } finally {
         setLoading(false);

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, memo, useCallback, useMemo } from "react";
 import { doc, getDoc } from "firebase/firestore";
-import { db } from "../../firebaseConfig";
+import { db, reportDatabaseUnavailable } from "../../firebaseConfig";
 import localforage from "localforage";
 import { useInView } from 'react-intersection-observer';
 import { 
@@ -291,6 +291,10 @@ function Hero() {
 
       // Se estiver visível, carregar dados do Firebase
       if (inView) {
+        if (!db) {
+          throw new Error("Firebase indisponível.");
+        }
+
         // Depois atualizar do Firestore (se necessário)
         const ref = doc(db, "profileData", "meuPerfil");
         const snap = await getDoc(ref);
@@ -317,6 +321,7 @@ function Hero() {
       }
     } catch (error) {
       console.error("Erro ao buscar dados do perfil:", error);
+      reportDatabaseUnavailable(error);
       setIsLoaded(true);
     }
   }, [profileData, isLoaded, inView]);

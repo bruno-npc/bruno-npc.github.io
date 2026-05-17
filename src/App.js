@@ -97,6 +97,11 @@ function App() {
   
   // Configura a autenticação
   useEffect(() => {
+    if (!auth) {
+      setUser(null);
+      return undefined;
+    }
+
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setUser(user);
     });

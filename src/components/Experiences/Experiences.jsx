@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { collection, getDocs } from "firebase/firestore";
-import { db } from "../../firebaseConfig";
+import { db, reportDatabaseUnavailable } from "../../firebaseConfig";
 import localforage from "localforage";
 import { 
   Box, 
@@ -41,6 +41,10 @@ function Experiences() {
           }
         }
 
+        if (!db) {
+          throw new Error("Firebase indisponível.");
+        }
+
         const querySnapshot = await getDocs(collection(db, "experiences"));
         const expList = [];
         querySnapshot.forEach((docSnap) => {
@@ -57,6 +61,7 @@ function Experiences() {
         });
       } catch (error) {
         console.error("Erro ao buscar experiências:", error);
+        reportDatabaseUnavailable(error);
       } finally {
         setLoading(false);
       }

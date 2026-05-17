@@ -11,8 +11,52 @@ const firebaseConfig = {
   appId: process.env.REACT_APP_FIREBASE_APP_ID,
 };
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const auth = getAuth(app);
+const requiredConfigKeys = [
+  "apiKey",
+  "authDomain",
+  "projectId",
+  "storageBucket",
+  "messagingSenderId",
+  "appId",
+];
 
-export { db, auth };
+const isFirebaseConfigured = requiredConfigKeys.every((key) => Boolean(firebaseConfig[key]));
+let firebaseInitializationError = null;
+let app = null;
+let db = null;
+let auth = null;
+
+if (isFirebaseConfigured) {
+  try {
+    app = initializeApp(firebaseConfig);
+    db = getFirestore(app);
+    auth = getAuth(app);
+  } catch (error) {
+    firebaseInitializationError = error;
+    console.error("Erro ao inicializar Firebase:", error);
+  }
+} else {
+  firebaseInitializationError = new Error("Configuração do Firebase ausente.");
+}
+
+const reportDatabaseUnavailable = (error) => {
+  if (typeof window === "undefined") return;
+
+  window.dispatchEvent(
+    new CustomEvent("database-unavailable", {
+      detail: {
+        message: error?.message || "Banco de dados indisponível.",
+      },
+    })
+  );
+};
+
+export {
+  app,
+  db,
+  auth,
+  firebaseConfig,
+  firebaseInitializationError,
+  isFirebaseConfigured,
+  reportDatabaseUnavailable,
+};

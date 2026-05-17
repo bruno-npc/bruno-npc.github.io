@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
-import { db } from "../../firebaseConfig";
+import { db, reportDatabaseUnavailable } from "../../firebaseConfig";
 import { Link } from "react-router-dom";
 import localforage from "localforage";
 import { 
@@ -40,6 +40,10 @@ function Projects() {
         }
 
         // Busca os dados atualizados no Firestore
+        if (!db) {
+          throw new Error("Firebase indisponível.");
+        }
+
         const querySnapshot = await getDocs(collection(db, "projetos"));
         const projectsList = querySnapshot.docs.map((doc) => ({
           id: doc.id,
@@ -54,6 +58,7 @@ function Projects() {
         });
       } catch (error) {
         console.error("Erro ao buscar projetos:", error);
+        reportDatabaseUnavailable(error);
         setError("Erro ao carregar os projetos. Tente novamente mais tarde.");
       } finally {
         setLoading(false);
