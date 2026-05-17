@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from "react";
-import { collection, getDocs } from "firebase/firestore";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Typography,
   Grid,
@@ -11,47 +10,29 @@ import {
   Box
 } from "@mui/material";
 import { Section } from "../../ui-components";
-import { db, reportDatabaseUnavailable } from "../../firebaseConfig";
+import useCachedCollection from "../../hooks/useCachedCollection";
 import { getIconComponent } from "../../utils/iconRegistry";
 
 function Skills() {
   const [selectedSkill, setSelectedSkill] = useState(0);
-  const [skillsData, setSkillsData] = useState([]);
-  const [loading, setLoading] = useState(true);
   const theme = useTheme();
+  const { data: skills, loading } = useCachedCollection({
+    collectionName: "skills",
+    cacheKey: "skillsData",
+  });
+
+  const skillsData = useMemo(() => skills.map((skill) => ({
+    id: skill.id,
+    name: skill.title || skill.name || "",
+    description: Array.isArray(skill.descriptions)
+      ? skill.descriptions.filter(Boolean).join("\n\n")
+      : skill.description || "",
+    icon: skill.icon || "",
+  })).filter((skill) => skill.name), [skills]);
 
   useEffect(() => {
-    const fetchSkills = async () => {
-      try {
-        if (!db) {
-          throw new Error("Firebase indisponível.");
-        }
-
-        const querySnapshot = await getDocs(collection(db, "skills"));
-        const skills = querySnapshot.docs.map((docSnap) => {
-          const data = docSnap.data();
-          return {
-            id: docSnap.id,
-            name: data.title || data.name || "",
-            description: Array.isArray(data.descriptions)
-              ? data.descriptions.filter(Boolean).join("\n\n")
-              : data.description || "",
-            icon: data.icon || "",
-          };
-        }).filter((skill) => skill.name);
-
-        setSkillsData(skills);
-        setSelectedSkill(0);
-      } catch (error) {
-        console.error("Erro ao buscar skills públicas:", error);
-        reportDatabaseUnavailable(error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchSkills();
-  }, []);
+    setSelectedSkill(0);
+  }, [skillsData.length]);
 
   return (
     <Section

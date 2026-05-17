@@ -9,7 +9,7 @@ import {
   IconButton,
   Drawer,
   List,
-  ListItem,
+  ListItemButton,
   ListItemText,
   ListItemIcon
 } from "@mui/material";
@@ -162,49 +162,46 @@ const Navbar = memo(({ isDarkMode, onToggleDarkMode, user }) => {
       </Box>
       <List className="drawer-nav-list">
         {!isHomePage && (
-          <ListItem button onClick={handleHomeClick} className="drawer-nav-item">
+          <ListItemButton onClick={handleHomeClick} className="drawer-nav-item">
             <ListItemIcon className="drawer-nav-icon"><Home /></ListItemIcon>
             <ListItemText primary={labels.home} />
-          </ListItem>
+          </ListItemButton>
         )}
 
         {isHomePage && navItems.map((item) => (
-          <ListItem
+          <ListItemButton
             key={item.id}
-            button
             onClick={() => handleNavigation(item.id)}
             className={`drawer-nav-item ${activeSection === item.id ? "active" : ""}`}
           >
             <ListItemIcon className="drawer-nav-icon">{item.icon}</ListItemIcon>
             <ListItemText primary={item.label} />
-          </ListItem>
+          </ListItemButton>
         ))}
 
         {!user && (
-          <ListItem
-            button
+          <ListItemButton
             onClick={handleLoginClick}
             className={`drawer-nav-item ${location.pathname === "/login" ? "active" : ""}`}
           >
             <ListItemIcon className="drawer-nav-icon"><LoginIcon /></ListItemIcon>
             <ListItemText primary={labels.login} />
-          </ListItem>
+          </ListItemButton>
         )}
 
         {user && (
           <>
-            <ListItem
-              button
+            <ListItemButton
               onClick={handleAdminClick}
               className={`drawer-nav-item ${location.pathname === "/admin" ? "active" : ""}`}
             >
               <ListItemIcon className="drawer-nav-icon"><Dashboard /></ListItemIcon>
               <ListItemText primary={labels.admin} />
-            </ListItem>
-            <ListItem button onClick={handleLogout} className="drawer-nav-item">
+            </ListItemButton>
+            <ListItemButton onClick={handleLogout} className="drawer-nav-item">
               <ListItemIcon className="drawer-nav-icon"><LogoutIcon /></ListItemIcon>
               <ListItemText primary={labels.logout} />
-            </ListItem>
+            </ListItemButton>
           </>
         )}
       </List>

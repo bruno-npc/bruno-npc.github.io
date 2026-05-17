@@ -1,64 +1,24 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Table, Button } from "react-bootstrap";
-import { collection, getDocs, deleteDoc, doc } from "firebase/firestore";
-import { db } from "../../firebaseConfig";
+import useAdminCollection from "../../hooks/useAdminCollection";
 import SkillsModal from "./modalSkills/ModalSkills";
 import "./SkillsList.css";
 import { getIconComponent } from "../../utils/iconRegistry";
 
 function SkillsList() {
-  const [skills, setSkills] = useState([]);
-  const [showModal, setShowModal] = useState(false);
-  const [editingSkill, setEditingSkill] = useState(null);
-
-  // Carrega skills no início
-  useEffect(() => {
-    fetchSkills();
-  }, []);
-
-  const fetchSkills = async () => {
-    try {
-      const querySnapshot = await getDocs(collection(db, "skills"));
-      const skillsList = [];
-      querySnapshot.forEach((docSnap) => {
-        skillsList.push({ id: docSnap.id, ...docSnap.data() });
-      });
-      setSkills(skillsList);
-    } catch (error) {
-      console.error("Erro ao buscar skills:", error);
-    }
-  };
-
-  const handleNewSkill = () => {
-    setEditingSkill(null);
-    setShowModal(true);
-  };
-
-  const handleEditSkill = (skill) => {
-    setEditingSkill(skill);
-    setShowModal(true);
-  };
-
-  const handleCloseModal = (reload = false) => {
-    setShowModal(false);
-    setEditingSkill(null);
-    if (reload) {
-      fetchSkills();
-    }
-  };
-
-  const handleDeleteSkill = async (id) => {
-    try {
-      await deleteDoc(doc(db, "skills", id));
-      fetchSkills();
-    } catch (error) {
-      console.error("Erro ao excluir skill:", error);
-    }
-  };
+  const {
+    items: skills,
+    showModal,
+    editingItem,
+    openNew,
+    openEdit,
+    closeModal,
+    deleteItem,
+  } = useAdminCollection("skills", "skills");
 
   return (
     <div className="skills-list-container">
-      <Button variant="success" onClick={handleNewSkill}>
+      <Button variant="success" onClick={openNew}>
         + Novo
       </Button>
 
@@ -77,19 +37,17 @@ function SkillsList() {
             const description = Array.isArray(skill.descriptions)
               ? skill.descriptions.filter(Boolean).join(" / ")
               : skill.description;
+
             return (
               <tr key={skill.id}>
                 <td>{skill.title || skill.name}</td>
                 <td>{description}</td>
-                <td>
-                  {/* Se skill.icon existir no map, exibe o componente */}
-                  {IconComponent && <IconComponent size={24} />}
-                </td>
+                <td>{IconComponent && <IconComponent size={24} />}</td>
                 <td>
                   <Button
                     variant="warning"
                     size="sm"
-                    onClick={() => handleEditSkill(skill)}
+                    onClick={() => openEdit(skill)}
                     className="me-2"
                   >
                     Editar
@@ -97,7 +55,7 @@ function SkillsList() {
                   <Button
                     variant="danger"
                     size="sm"
-                    onClick={() => handleDeleteSkill(skill.id)}
+                    onClick={() => deleteItem(skill.id)}
                   >
                     Excluir
                   </Button>
@@ -111,8 +69,8 @@ function SkillsList() {
       {showModal && (
         <SkillsModal
           show={showModal}
-          handleClose={handleCloseModal}
-          editingSkill={editingSkill}
+          handleClose={closeModal}
+          editingSkill={editingItem}
         />
       )}
     </div>

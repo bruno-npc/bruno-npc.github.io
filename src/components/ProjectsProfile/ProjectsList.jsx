@@ -1,60 +1,23 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Table, Button } from "react-bootstrap";
-import { collection, getDocs, deleteDoc, doc } from "firebase/firestore";
-import { db } from "../../firebaseConfig";
+import useAdminCollection from "../../hooks/useAdminCollection";
 import ProjectModal from "./modalProjects/ProjectModal";
 import "./ProjectsList.css";
 
 function ProjectsList() {
-  const [projects, setProjects] = useState([]);
-  const [showModal, setShowModal] = useState(false);
-  const [editingProject, setEditingProject] = useState(null);
-
-  useEffect(() => {
-    fetchProjects();
-  }, []);
-
-  const fetchProjects = async () => {
-    try {
-      const querySnapshot = await getDocs(collection(db, "projetos"));
-      const list = [];
-      querySnapshot.forEach((docSnap) => {
-        list.push({ id: docSnap.id, ...docSnap.data() });
-      });
-      setProjects(list);
-    } catch (error) {
-      console.error("Erro ao buscar projetos:", error);
-    }
-  };
-
-  const handleNewProject = () => {
-    setEditingProject(null);
-    setShowModal(true);
-  };
-
-  const handleEditProject = (project) => {
-    setEditingProject(project);
-    setShowModal(true);
-  };
-
-  const handleCloseModal = (reload = false) => {
-    setShowModal(false);
-    setEditingProject(null);
-    if (reload) fetchProjects();
-  };
-
-  const handleDelete = async (id) => {
-    try {
-      await deleteDoc(doc(db, "projetos", id));
-      fetchProjects();
-    } catch (error) {
-      console.error("Erro ao deletar projeto:", error);
-    }
-  };
+  const {
+    items: projects,
+    showModal,
+    editingItem,
+    openNew,
+    openEdit,
+    closeModal,
+    deleteItem,
+  } = useAdminCollection("projetos", "projetos");
 
   return (
     <div className="projects-list-container">
-      <Button variant="success" onClick={handleNewProject}>
+      <Button variant="success" onClick={openNew}>
         + Novo Projeto
       </Button>
 
@@ -68,9 +31,7 @@ function ProjectsList() {
         </thead>
         <tbody>
           {projects.map((p) => {
-            const stacksText = Array.isArray(p.stacks)
-              ? p.stacks.join(", ")
-              : "";
+            const stacksText = Array.isArray(p.stacks) ? p.stacks.join(", ") : "";
             return (
               <tr key={p.id}>
                 <td>{p.title}</td>
@@ -79,7 +40,7 @@ function ProjectsList() {
                   <Button
                     variant="warning"
                     size="sm"
-                    onClick={() => handleEditProject(p)}
+                    onClick={() => openEdit(p)}
                     className="me-2"
                   >
                     Editar
@@ -87,7 +48,7 @@ function ProjectsList() {
                   <Button
                     variant="danger"
                     size="sm"
-                    onClick={() => handleDelete(p.id)}
+                    onClick={() => deleteItem(p.id)}
                   >
                     Excluir
                   </Button>
@@ -101,8 +62,8 @@ function ProjectsList() {
       {showModal && (
         <ProjectModal
           show={showModal}
-          handleClose={handleCloseModal}
-          editingProject={editingProject}
+          handleClose={closeModal}
+          editingProject={editingItem}
         />
       )}
     </div>
